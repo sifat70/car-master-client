@@ -4,8 +4,8 @@ import { AuthContext } from "../../provider/AuthProvider";
 
 const BookService = () => {
     const service = useLoaderData();
-    const { title, _id, price } = service;
-    const {user} = useContext(AuthContext)
+    const { title, _id, price, img } = service;
+    const { user } = useContext(AuthContext)
 
 
     const handleBookService = event => {
@@ -14,18 +14,35 @@ const BookService = () => {
         const form = event.target;
         const name = form.name.value;
         const date = form.date.value;
-        const email = form?.email;
-        const order = {
+        const email = form?.email.value;
+        const booking = {
             customerName: name,
             email,
+            img,
             date,
-            service: _id,
+            service: title,
+            service_id: _id,
             price: price
         }
 
-        console.log(order)
+        console.log(booking);
+
+        fetch('http://localhost:5000/bookings', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(booking)
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                if (data.insertedId) {
+                    alert('Service book successfully')
+                }
+            })
     }
-    return (  
+    return (
         <div>
             <h1 className="text-center text-3xl">Book Service: {title}</h1>
 
@@ -53,7 +70,7 @@ const BookService = () => {
                         <label className="label">
                             <span className="label-text">Due Amount</span>
                         </label>
-                        <input type="text" defaultValue={'$'+ price} className="input input-bordered" required />
+                        <input type="text" defaultValue={'$' + price} className="input input-bordered" required />
                     </div>
                 </div>
                 <div className="form-control mt-6">
